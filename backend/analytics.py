@@ -19,6 +19,7 @@ def get_difficulty_stats(data: dict) -> dict:
 def get_topic_stats(data: dict) -> list:
     """
     Extracts topic tag names and problems solved, returns a sorted list from weakest to strongest.
+    Filters out topics with problems solved less than 3, and only keeps allowed DSA topics.
     """
     matched_user = data.get("data", {}).get("matchedUser")
     if not matched_user:
@@ -27,13 +28,30 @@ def get_topic_stats(data: dict) -> list:
     tag_counts = matched_user.get("tagProblemCounts", {})
     all_topics = []
     
+    allowed_topics = {
+        "Array", "String", "Dynamic Programming", "Tree", "Graph", 
+        "Binary Search", "Linked List", "Stack", "Queue", "Heap", 
+        "Recursion", "Backtracking", "Sorting", "Hashing", "Math"
+    }
+    
     for category in ["advanced", "intermediate", "fundamental"]:
         topics = tag_counts.get(category) or []
         for topic in topics:
-            all_topics.append({
-                "tagName": topic.get("tagName"),
-                "problemsSolved": topic.get("problemsSolved", 0)
-            })
+            tag_name = topic.get("tagName")
+            solved = topic.get("problemsSolved", 0)
+            
+            # Map actual LeetCode tag names to the allowed list names
+            display_name = tag_name
+            if tag_name == "Hash Table":
+                display_name = "Hashing"
+            elif tag_name == "Heap (Priority Queue)":
+                display_name = "Heap"
+                
+            if display_name in allowed_topics and solved >= 3:
+                all_topics.append({
+                    "tagName": display_name,
+                    "problemsSolved": solved
+                })
             
     # Sort from weakest to strongest (ascending by problemsSolved)
     all_topics.sort(key=lambda x: x["problemsSolved"])
