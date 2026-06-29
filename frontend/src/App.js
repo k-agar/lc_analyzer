@@ -31,7 +31,7 @@ function App() {
     console.log(`Sending request for username: ${username}`);
 
     try {
-      const response = await fetch(`http://localhost:8000/analyze/${username}`);
+      const response = await fetch(`https://lc-analyzer.onrender.com/analyze/${username}`);
       if (response.status === 404) {
         throw new Error('User not found');
       }
