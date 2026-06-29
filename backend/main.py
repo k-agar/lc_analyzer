@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from leetcode import fetch_user_data
+from analytics import get_summary
 
 app = FastAPI()
 
@@ -18,5 +19,6 @@ def health():
 
 @app.get("/analyze/{username}")
 async def analyze_user(username: str):
-    return await fetch_user_data(username)
+    data = await fetch_user_data(username)
+    return get_summary(data)
 
