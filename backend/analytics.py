@@ -1,3 +1,5 @@
+import json
+
 def get_difficulty_stats(data: dict) -> dict:
     """
     Extracts Easy, Medium, Hard solved counts and returns them as a dict.
@@ -37,11 +39,26 @@ def get_topic_stats(data: dict) -> list:
     all_topics.sort(key=lambda x: x["problemsSolved"])
     return all_topics
 
+def get_submission_calendar(data: dict) -> dict:
+    """
+    Extracts submissionCalendar string and parses it into a dict of {timestamp: count}.
+    """
+    matched_user = data.get("data", {}).get("matchedUser")
+    if not matched_user:
+        return {}
+    
+    calendar_str = matched_user.get("userCalendar", {}).get("submissionCalendar", "{}")
+    try:
+        return json.loads(calendar_str)
+    except Exception:
+        return {}
+
 def get_summary(data: dict) -> dict:
     """
-    Returns a combined dict with both difficulty stats and topic stats.
+    Returns a combined dict with difficulty stats, topic stats, and submission calendar.
     """
     return {
         "difficulty": get_difficulty_stats(data),
-        "topics": get_topic_stats(data)
+        "topics": get_topic_stats(data),
+        "calendar": get_submission_calendar(data)
     }

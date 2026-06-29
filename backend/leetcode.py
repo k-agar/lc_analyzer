@@ -17,6 +17,9 @@ async def fetch_user_data(username: str):
           intermediate { tagName problemsSolved }
           fundamental { tagName problemsSolved }
         }
+        userCalendar {
+          submissionCalendar
+        }
       }
     }
     """
