@@ -48,7 +48,12 @@ async def generate_study_plan(topic_stats: list) -> str:
             json=payload,
             timeout=30.0
         )
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 429:
+                return "Study plan temporarily unavailable, please try again in a moment"
+            raise e
         result = response.json()
         
     try:
