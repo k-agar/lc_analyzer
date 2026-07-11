@@ -14,17 +14,24 @@ async def generate_study_plan(topic_stats: list) -> str:
     picks the top 5 weakest topics, and generates a 7-day personalized
     LeetCode study plan using the Gemini API.
     """
-    # Pick the top 5 weakest topics (which are the first 5 in the sorted list)
-    weakest_topics = topic_stats[:5]
-    topic_names = [topic.get("tagName") for topic in weakest_topics if topic.get("tagName")]
-    
-    if not topic_names:
+    if not topic_stats:
         return "No topics available to generate a study plan."
+        
+    weakest_topics = topic_stats[:5]
+    strongest_topics = topic_stats[-3:]
+    
+    weakest_names = [topic.get("tagName") for topic in weakest_topics if topic.get("tagName")]
+    strongest_names = [topic.get("tagName") for topic in strongest_topics if topic.get("tagName")]
     
     prompt = (
         "You are an expert technical interview coach.\n"
-        f"Generate a 7-day personalized LeetCode study plan focused on these topics: {', '.join(topic_names)}.\n"
-        "Please provide a daily breakdown outlining what to study and the type of problems to practice."
+        f"Strongest topics: {', '.join(strongest_names)}\n"
+        f"Weakest topics: {', '.join(weakest_names)}\n\n"
+        "Please perform the following:\n"
+        "1. Identify the top 3 strongest topics (last 3 in the list) and mention them.\n"
+        "2. Identify the top 5 weakest topics (first 5 in the list) and focus on them.\n"
+        "3. Generate a 7-day study plan with specific problem types to practice each day.\n"
+        "4. Keep the response concise and structured with clear Day 1, Day 2... headings."
     )
     
     payload = {
