@@ -11,6 +11,9 @@ import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
 import './App.css';
 
+const API_BASE = process.env.REACT_APP_API_URL || 
+  (process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://lc-analyzer.onrender.com');
+
 function App() {
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
@@ -31,7 +34,7 @@ function App() {
     console.log(`Sending request for username: ${username}`);
 
     try {
-      const response = await fetch(`https://lc-analyzer.onrender.com/analyze/${username}`);
+      const response = await fetch(`${API_BASE}/analyze/${username}`);
       if (response.status === 404) {
         throw new Error('User not found');
       }
