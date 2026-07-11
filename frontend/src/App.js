@@ -124,6 +124,44 @@ function App() {
               </div>
             </div>
 
+            <div className="card contest-card">
+              <h3>Contest Performance</h3>
+              {data.contest ? (
+                <div className="contest-stats">
+                  <div className="rating-display">
+                    <span className="rating-value">{data.contest.rating}</span>
+                    {data.contest.badge && (
+                      <span className={`contest-badge ${data.contest.badge.toLowerCase()}`}>
+                        {data.contest.badge}
+                      </span>
+                    )}
+                  </div>
+                  <div className="stats-grid">
+                    <div className="contest-stat-item">
+                      <span className="label">Global Rank</span>
+                      <span className="value">
+                        {data.contest.globalRanking.toLocaleString()} / {data.contest.totalParticipants.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="contest-stat-item">
+                      <span className="label">Percentile</span>
+                      <span className="value">Top {data.contest.topPercentage}%</span>
+                    </div>
+                    <div className="contest-stat-item">
+                      <span className="label">Attended</span>
+                      <span className="value">{data.contest.attendedContestsCount} Contests</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="contest-empty">
+                  <div className="empty-icon">🏆</div>
+                  <p>No contest history</p>
+                  <span>Participate in LeetCode contests to get rated.</span>
+                </div>
+              )}
+            </div>
+
             {data.topics && data.topics.length > 0 && (
               <div className="card chart-card">
                 <h3>Weakest Topics Profile</h3>
@@ -146,6 +184,40 @@ function App() {
               </div>
             )}
 
+            <div className="card badges-card">
+              <h3>Badges Earned ({data.badges ? data.badges.length : 0})</h3>
+              {data.badges && data.badges.length > 0 ? (
+                <div className="badges-grid-container">
+                  <div className="badges-grid">
+                    {data.badges.map((badge) => (
+                      <div className="badge-item-wrapper" key={badge.id || badge.name}>
+                        <div className="badge-icon-container">
+                          <img
+                            src={badge.icon}
+                            alt={badge.displayName}
+                            className="badge-icon-img"
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                            }}
+                          />
+                        </div>
+                        <div className="badge-tooltip">
+                          <div className="tooltip-name">{badge.displayName}</div>
+                          {badge.hoverText && <div className="tooltip-desc">{badge.hoverText}</div>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="badges-empty">
+                  <div className="empty-icon">🏅</div>
+                  <p>No badges earned yet</p>
+                  <span>Solve daily challenges and study plans to earn badges!</span>
+                </div>
+              )}
+            </div>
+
             {data.calendar && (
               <div className="card heatmap-card">
                 <h3>Submission Calendar (Past Year)</h3>
@@ -164,11 +236,63 @@ function App() {
                 </div>
               </div>
             )}
+
+            {data.study_plan && (
+              <div className="card study-plan-card">
+                <h3>Your Personalized Study Plan</h3>
+                <div className="study-plan-content">
+                  {renderMarkdown(data.study_plan)}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
     </div>
   );
 }
+
+const parseBold = (text) => {
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={i}>{part.slice(2, -2)}</strong>;
+    }
+    return part;
+  });
+};
+
+const renderMarkdown = (text) => {
+  if (!text) return null;
+  
+  const lines = text.split('\n');
+  return lines.map((line, index) => {
+    if (line.startsWith('### ')) {
+      return <h4 key={index}>{line.replace('### ', '')}</h4>;
+    }
+    if (line.startsWith('## ')) {
+      return <h3 key={index}>{line.replace('## ', '')}</h3>;
+    }
+    if (line.startsWith('# ')) {
+      return <h2 key={index}>{line.replace('# ', '')}</h2>;
+    }
+    
+    const isListItem = line.trim().startsWith('- ') || line.trim().startsWith('* ');
+    if (isListItem) {
+      const cleanLine = line.trim().substring(2);
+      return (
+        <li key={index}>
+          {parseBold(cleanLine)}
+        </li>
+      );
+    }
+    
+    if (line.trim() === '') {
+      return <div key={index} style={{ height: '0.5rem' }} />;
+    }
+    
+    return <p key={index}>{parseBold(line)}</p>;
+  });
+};
 
 export default App;

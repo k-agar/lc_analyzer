@@ -20,6 +20,23 @@ async def fetch_user_data(username: str):
         userCalendar {
           submissionCalendar
         }
+        badges {
+          id
+          name
+          displayName
+          icon
+          hoverText
+        }
+      }
+      userContestRanking(username: $username) {
+        attendedContestsCount
+        rating
+        globalRanking
+        totalParticipants
+        topPercentage
+        badge {
+          name
+        }
       }
     }
     """

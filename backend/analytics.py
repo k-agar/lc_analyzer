@@ -71,12 +71,56 @@ def get_submission_calendar(data: dict) -> dict:
     except Exception:
         return {}
 
+def get_badges_stats(data: dict) -> list:
+    """
+    Extracts badges the user got.
+    Each badge has id, name, displayName, icon, hoverText.
+    """
+    matched_user = data.get("data", {}).get("matchedUser")
+    if not matched_user:
+        return []
+    
+    badges = matched_user.get("badges", [])
+    processed_badges = []
+    for badge in badges:
+        icon_url = badge.get("icon", "")
+        if icon_url and icon_url.startswith("/"):
+            icon_url = f"https://leetcode.com{icon_url}"
+        
+        processed_badges.append({
+            "id": badge.get("id"),
+            "name": badge.get("name"),
+            "displayName": badge.get("displayName"),
+            "icon": icon_url,
+            "hoverText": badge.get("hoverText")
+        })
+    return processed_badges
+
+def get_contest_ranking(data: dict) -> dict:
+    """
+    Extracts user contest ranking.
+    """
+    contest_data = data.get("data", {}).get("userContestRanking")
+    if not contest_data:
+        return None
+    
+    return {
+        "attendedContestsCount": contest_data.get("attendedContestsCount"),
+        "rating": round(contest_data.get("rating", 0)),
+        "globalRanking": contest_data.get("globalRanking"),
+        "totalParticipants": contest_data.get("totalParticipants"),
+        "topPercentage": contest_data.get("topPercentage"),
+        "badge": contest_data.get("badge", {}).get("name") if contest_data.get("badge") else None
+    }
+
 def get_summary(data: dict) -> dict:
     """
-    Returns a combined dict with difficulty stats, topic stats, and submission calendar.
+    Returns a combined dict with difficulty stats, topic stats, submission calendar, badges, and contest ranking.
     """
     return {
         "difficulty": get_difficulty_stats(data),
         "topics": get_topic_stats(data),
-        "calendar": get_submission_calendar(data)
+        "calendar": get_submission_calendar(data),
+        "badges": get_badges_stats(data),
+        "contest": get_contest_ranking(data)
     }
