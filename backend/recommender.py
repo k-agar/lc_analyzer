@@ -14,6 +14,7 @@ async def generate_study_plan(topic_stats: list) -> str:
     picks the top 5 weakest topics, and generates a 7-day personalized
     LeetCode study plan using the Gemini API.
     """
+    print(f"Loaded GEMINI_API_KEY: {GEMINI_API_KEY}")
     if not topic_stats:
         return "No topics available to generate a study plan."
         
@@ -43,7 +44,8 @@ async def generate_study_plan(topic_stats: list) -> str:
     }
     
     headers = {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "x-goog-api-key": GEMINI_API_KEY
     }
     
     url = f"{GEMINI_URL}?key={GEMINI_API_KEY}"
@@ -58,9 +60,8 @@ async def generate_study_plan(topic_stats: list) -> str:
         try:
             response.raise_for_status()
         except httpx.HTTPStatusError as e:
-            if e.response.status_code == 429:
-                return "Study plan temporarily unavailable, please try again in a moment"
-            raise e
+            print("Error response:", e.response.text)
+            return "Study plan temporarily unavailable, please try again later"
         result = response.json()
         
     try:

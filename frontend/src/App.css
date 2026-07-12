@@ -330,6 +330,17 @@ h1 {
   color: #818cf8;
 }
 
+.study-plan-content .study-plan-day-heading {
+  color: #c084fc;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.35rem;
+  display: block;
+}
+
 /* Contest Card Styles */
 .contest-card {
   min-height: 250px;

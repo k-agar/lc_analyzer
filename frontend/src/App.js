@@ -221,6 +221,15 @@ function App() {
               )}
             </div>
 
+            {data.study_plan && (
+              <div className="card study-plan-card">
+                <h3>AI Study Plan</h3>
+                <div className="study-plan-content">
+                  {renderMarkdown(data.study_plan)}
+                </div>
+              </div>
+            )}
+
             {data.calendar && (
               <div className="card heatmap-card">
                 <h3>Submission Calendar (Past Year)</h3>
@@ -236,15 +245,6 @@ function App() {
                       return `color-scale-${Math.min(value.count, 4)}`;
                     }}
                   />
-                </div>
-              </div>
-            )}
-
-            {data.study_plan && (
-              <div className="card study-plan-card">
-                <h3>Your Personalized Study Plan</h3>
-                <div className="study-plan-content">
-                  {renderMarkdown(data.study_plan)}
                 </div>
               </div>
             )}
@@ -268,21 +268,41 @@ const parseBold = (text) => {
 const renderMarkdown = (text) => {
   if (!text) return null;
   
-  const lines = text.split('\n');
+  // Ensure any inline or list item starting with 'Day X' starts on a new line.
+  let processedText = text;
+  processedText = processedText.replace(/(?!^)\b(Day \d+)\b/g, '\n$1');
+  
+  const lines = processedText.split('\n');
   return lines.map((line, index) => {
-    if (line.startsWith('### ')) {
-      return <h4 key={index}>{line.replace('### ', '')}</h4>;
-    }
-    if (line.startsWith('## ')) {
-      return <h3 key={index}>{line.replace('## ', '')}</h3>;
-    }
-    if (line.startsWith('# ')) {
-      return <h2 key={index}>{line.replace('# ', '')}</h2>;
+    const trimmedLine = line.trim();
+    if (trimmedLine === '') {
+      return <div key={index} style={{ height: '0.5rem' }} />;
     }
     
-    const isListItem = line.trim().startsWith('- ') || line.trim().startsWith('* ');
+    // Check if line is a Day X heading
+    const isDayHeading = /^(Day \d+|### Day \d+|## Day \d+|# Day \d+)/i.test(trimmedLine);
+    if (isDayHeading) {
+      const cleanDay = trimmedLine.replace(/^(### |## |# )/i, '').trim();
+      return (
+        <h4 key={index} className="study-plan-day-heading">
+          {parseBold(cleanDay)}
+        </h4>
+      );
+    }
+    
+    if (trimmedLine.startsWith('### ')) {
+      return <h4 key={index}>{parseBold(trimmedLine.replace('### ', ''))}</h4>;
+    }
+    if (trimmedLine.startsWith('## ')) {
+      return <h3 key={index}>{parseBold(trimmedLine.replace('## ', ''))}</h3>;
+    }
+    if (trimmedLine.startsWith('# ')) {
+      return <h2 key={index}>{parseBold(trimmedLine.replace('# ', ''))}</h2>;
+    }
+    
+    const isListItem = trimmedLine.startsWith('- ') || trimmedLine.startsWith('* ');
     if (isListItem) {
-      const cleanLine = line.trim().substring(2);
+      const cleanLine = trimmedLine.substring(2);
       return (
         <li key={index}>
           {parseBold(cleanLine)}
@@ -290,11 +310,7 @@ const renderMarkdown = (text) => {
       );
     }
     
-    if (line.trim() === '') {
-      return <div key={index} style={{ height: '0.5rem' }} />;
-    }
-    
-    return <p key={index}>{parseBold(line)}</p>;
+    return <p key={index}>{parseBold(trimmedLine)}</p>;
   });
 };
 
