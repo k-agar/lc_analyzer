@@ -171,15 +171,15 @@ function App() {
                 <div className="chart-wrapper">
                   <ResponsiveContainer width="100%" height="100%">
                     <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data.topics.slice(0, 8)}>
-                      <PolarGrid stroke="#475569" />
-                      <PolarAngleAxis dataKey="tagName" stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-                      <PolarRadiusAxis angle={30} domain={[0, 'auto']} stroke="#475569" tick={{ fill: '#94a3b8', fontSize: 9 }} />
+                      <PolarGrid stroke="#e5e7eb" />
+                      <PolarAngleAxis dataKey="tagName" stroke="#4b5563" tick={{ fill: '#4b5563', fontSize: 11 }} />
+                      <PolarRadiusAxis angle={30} domain={[0, 'auto']} stroke="#e5e7eb" tick={{ fill: '#4b5563', fontSize: 9 }} />
                       <Radar
                         name="Solved"
                         dataKey="problemsSolved"
-                        stroke="#818cf8"
-                        fill="#818cf8"
-                        fillOpacity={0.3}
+                        stroke="#000000"
+                        fill="#000000"
+                        fillOpacity={0.15}
                       />
                     </RadarChart>
                   </ResponsiveContainer>
@@ -223,7 +223,7 @@ function App() {
 
             {data.study_plan && (
               <div className="card study-plan-card">
-                <h3>AI Study Plan</h3>
+                <h3>Recommended Study Plan</h3>
                 <div className="study-plan-content">
                   {renderMarkdown(data.study_plan)}
                 </div>
