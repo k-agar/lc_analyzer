@@ -19,6 +19,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState({ type: '', message: '' });
   const [data, setData] = useState(null);
+  const [activePlanTab, setActivePlanTab] = useState('7_days');
 
   const today = new Date();
   const oneYearAgo = new Date();
@@ -221,11 +222,31 @@ function App() {
               )}
             </div>
 
-            {data.study_plan && (
+            {(data.study_plan_7 || data.study_plan_30 || data.study_plan) && (
               <div className="card study-plan-card">
-                <h3>Recommended Study Plan</h3>
+                <div className="study-plan-header">
+                  <h3>Recommended Study Plan</h3>
+                  <div className="tab-buttons">
+                    <button 
+                      className={`tab-btn ${activePlanTab === '7_days' ? 'active' : ''}`}
+                      onClick={() => setActivePlanTab('7_days')}
+                    >
+                      7-Day Sprint
+                    </button>
+                    <button 
+                      className={`tab-btn ${activePlanTab === '1_month' ? 'active' : ''}`}
+                      onClick={() => setActivePlanTab('1_month')}
+                    >
+                      1-Month Deep Dive
+                    </button>
+                  </div>
+                </div>
                 <div className="study-plan-content">
-                  {renderMarkdown(data.study_plan)}
+                  {renderMarkdown(
+                    activePlanTab === '7_days' 
+                      ? (data.study_plan_7 || data.study_plan) 
+                      : (data.study_plan_30 || data.study_plan)
+                  )}
                 </div>
               </div>
             )}
@@ -268,9 +289,16 @@ const parseBold = (text) => {
 const renderMarkdown = (text) => {
   if (!text) return null;
   
-  // Ensure any inline or list item starting with 'Day X' starts on a new line.
+  // Ensure any inline day/week starting with 'Day X' or 'Week X' starts on a new line, unless already at the start of a markdown line.
   let processedText = text;
-  processedText = processedText.replace(/(?!^)\b(Day \d+)\b/g, '\n$1');
+  processedText = processedText.replace(/\b(Day \d+|Week \d+)\b/g, (match, p1, offset, string) => {
+    const before = string.slice(0, offset);
+    const lastLine = before.split('\n').pop() || '';
+    if (/^[-\s*#_]*$/.test(lastLine)) {
+      return match;
+    }
+    return '\n' + match;
+  });
   
   const lines = processedText.split('\n');
   return lines.map((line, index) => {

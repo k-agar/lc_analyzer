@@ -24,7 +24,11 @@ async def analyze_user(username: str):
     if not data.get("data", {}).get("matchedUser"):
         raise HTTPException(status_code=404, detail="User not found")
     summary = get_summary(data)
-    study_plan = await generate_study_plan(summary["topics"])
-    summary["study_plan"] = study_plan
+    study_plan_7 = await generate_study_plan(summary["topics"], plan_type="7_days")
+    study_plan_30 = await generate_study_plan(summary["topics"], plan_type="1_month")
+    summary["study_plan_7"] = study_plan_7
+    summary["study_plan_30"] = study_plan_30
+    summary["study_plan"] = study_plan_7
     return summary
+
 
