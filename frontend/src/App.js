@@ -113,6 +113,10 @@ function App() {
             <div className="card stats-card">
               <h3>Difficulty Stats</h3>
               <div className="stats-list">
+                <div className="stat-item total">
+                  <span className="label">Total Solved</span>
+                  <span className="value">{data.difficulty.All || (data.difficulty.Easy + data.difficulty.Medium + data.difficulty.Hard)}</span>
+                </div>
                 <div className="stat-item easy">
                   <span className="label">Easy</span>
                   <span className="value">{data.difficulty.Easy}</span>

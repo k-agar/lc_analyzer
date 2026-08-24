@@ -6,10 +6,10 @@ def get_difficulty_stats(data: dict) -> dict:
     """
     matched_user = data.get("data", {}).get("matchedUser")
     if not matched_user:
-        return {"Easy": 0, "Medium": 0, "Hard": 0}
+        return {"All": 0, "Easy": 0, "Medium": 0, "Hard": 0}
     
     submissions = matched_user.get("submitStatsGlobal", {}).get("acSubmissionNum", [])
-    stats = {"Easy": 0, "Medium": 0, "Hard": 0}
+    stats = {"All": 0, "Easy": 0, "Medium": 0, "Hard": 0}
     for item in submissions:
         diff = item.get("difficulty")
         if diff in stats:
